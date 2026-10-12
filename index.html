@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Pharma Supplier Details</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- ANIMATED BACKGROUND -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="orb orb-4"></div>
+  </div>
+
+  <!-- PARTICLE CANVAS -->
+  <canvas id="particles"></canvas>
+
+  <!-- LOADER -->
+  <div class="loader-overlay" id="loaderOverlay">
+    <div class="loader-content">
+      <div class="loader-ring"></div>
+      <div class="loader-ring loader-ring-2"></div>
+      <div class="loader-icon"><i class="fas fa-pills"></i></div>
+      <p class="loader-text">Loading System...</p>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">
+          <i class="fas fa-pills"></i>
+        </div>
+        <div class="nav-title-wrap">
+          <span class="nav-title">AI Pharma</span>
+          <span class="nav-sub">Supplier Details</span>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <div class="nav-stat">
+          <span class="ns-count" id="navTotal">0</span>
+          <span class="ns-label">Records</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO SECTION -->
+  <section class="hero" id="heroSection">
+    <div class="hero-inner">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Live System Active</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="title-line">AI Pharma</span>
+        <span class="title-line gradient-text">Supplier Details</span>
+      </h1>
+      <p class="hero-desc">Manage pharmaceutical suppliers, employees, and product data in one intelligent system.</p>
+      <div class="hero-cta">
+        <button class="cta-primary" id="heroAddBtn">
+          <i class="fas fa-plus-circle"></i>
+          <span>Add New Supplier</span>
+          <div class="btn-shine"></div>
+        </button>
+        <button class="cta-secondary" id="heroViewBtn">
+          <i class="fas fa-table"></i>
+          <span>View Records</span>
+        </button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="visual-card vc-1">
+        <i class="fas fa-building"></i>
+        <span id="heroCompanies">0</span>
+        <label>Companies</label>
+      </div>
+      <div class="visual-card vc-2">
+        <i class="fas fa-users"></i>
+        <span id="heroEmployees">0</span>
+        <label>Employees</label>
+      </div>
+      <div class="visual-card vc-3">
+        <i class="fas fa-capsules"></i>
+        <span id="heroProducts">0</span>
+        <label>Products</label>
+      </div>
+      <div class="visual-card vc-4">
+        <i class="fas fa-database"></i>
+        <span id="heroRecords">0</span>
+        <label>Total</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content">
+
+    <!-- ADD FORM SECTION -->
+    <section class="section form-section" id="formSection">
+      <div class="section-header">
+        <div class="section-label">
+          <div class="label-icon"><i class="fas fa-plus"></i></div>
+          <span id="sectionTitle">New Supplier Entry</span>
+        </div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="glass-card form-card" id="formCard">
+        <div class="card-glow"></div>
+        <form id="supplierForm">
+          <input type="hidden" id="editId"/>
+          <div class="form-grid">
+            <div class="field-wrap">
+              <div class="field-icon"><i class="fas fa-building"></i></div>
+              <div class="field-body">
+                <input type="text" id="companyName" class="field-input" placeholder=" " autocomplete="off"/>
+                <label class="field-label">Company Name</label>
+                <div class="field-line"></div>
+              </div>
+            </div>
+            <div class="field-wrap">
+              <div class="field-icon"><i class="fas fa-user-tie"></i></div>
+              <div class="field-body">
+                <input type="text" id="employeeName" class="field-input" placeholder=" " autocomplete="off"/>
+                <label class="field-label">Employee Name</label>
+                <div class="field-line"></div>
+              </div>
+            </div>
+            <div class="field-wrap">
+              <div class="field-icon"><i class="fas fa-phone"></i></div>
+              <div class="field-body">
+                <input type="tel" id="phoneNumber" class="field-input" placeholder=" " autocomplete="off"/>
+                <label class="field-label">Phone Number</label>
+                <div class="field-line"></div>
+              </div>
+            </div>
+            <div class="field-wrap">
+              <div class="field-icon"><i class="fas fa-capsules"></i></div>
+              <div class="field-body">
+                <input type="text" id="productName" class="field-input" placeholder=" " autocomplete="off"/>
+                <label class="field-label">Product Name</label>
+                <div class="field-line"></div>
+              </div>
+            </div>
+            <div class="field-wrap field-full">
+              <div class="field-icon"><i class="fas fa-truck"></i></div>
+              <div class="field-body">
+                <input type="text" id="suppliedBy" class="field-input" placeholder=" " autocomplete="off"/>
+                <label class="field-label">Supplied By (Company)</label>
+                <div class="field-line"></div>
+              </div>
+            </div>
+          </div>
+          <div class="form-footer">
+            <button type="submit" class="btn-premium" id="submitBtn">
+              <span class="btn-inner">
+                <i class="fas fa-save"></i>
+                <span id="submitText">Save Supplier</span>
+              </span>
+              <div class="btn-bg"></div>
+              <div class="btn-ripple" id="btnRipple"></div>
+            </button>
+            <button type="button" class="btn-ghost btn-cancel" id="cancelBtn">
+              <i class="fas fa-times"></i> Cancel
+            </button>
+            <button type="button" class="btn-ghost" id="clearBtn">
+              <i class="fas fa-eraser"></i> Clear
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- RECORDS SECTION -->
+    <section class="section records-section" id="recordsSection">
+      <div class="section-header">
+        <div class="section-label">
+          <div class="label-icon green"><i class="fas fa-list-alt"></i></div>
+          <span>Supplier Records</span>
+        </div>
+        <div class="section-line"></div>
+      </div>
+
+      <div class="glass-card records-card">
+        <div class="card-glow green-glow"></div>
+        <div class="records-toolbar">
+          <div class="search-wrap">
+            <i class="fas fa-search search-ico"></i>
+            <input type="text" id="searchInput" class="search-input" placeholder="Search suppliers, products, companies..."/>
+            <button class="search-clear" id="clearSearch">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="record-count-wrap">
+            <span class="rc-num" id="recordCount">0</span>
+            <span class="rc-label">results</span>
+          </div>
+        </div>
+
+        <div class="table-container" id="tableContainer">
+          <table id="supplierTable">
+            <thead>
+              <tr>
+                <th class="th-num">#</th>
+                <th><i class="fas fa-building"></i> Company</th>
+                <th><i class="fas fa-user-tie"></i> Employee</th>
+                <th><i class="fas fa-phone"></i> Number</th>
+                <th><i class="fas fa-capsules"></i> Product</th>
+                <th><i class="fas fa-truck"></i> Supplied By</th>
+                <th><i class="fas fa-calendar-alt"></i> Date</th>
+                <th class="th-action"><i class="fas fa-cog"></i></th>
+              </tr>
+            </thead>
+            <tbody id="supplierTableBody"></tbody>
+          </table>
+
+          <div class="empty-state" id="emptyState">
+            <div class="empty-anim">
+              <div class="empty-circle">
+                <i class="fas fa-database"></i>
+              </div>
+              <div class="empty-rings">
+                <div class="er er-1"></div>
+                <div class="er er-2"></div>
+                <div class="er er-3"></div>
+              </div>
+            </div>
+            <h3>No records yet</h3>
+            <p>Add your first supplier to get started</p>
+            <button class="btn-premium small" id="emptyAddBtn">
+              <span class="btn-inner"><i class="fas fa-plus"></i> Add Supplier</span>
+              <div class="btn-bg"></div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- DELETE MODAL -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box" id="modalBox">
+      <div class="modal-icon-wrap">
+        <div class="modal-icon-ring"></div>
+        <div class="modal-icon"><i class="fas fa-trash-alt"></i></div>
+      </div>
+      <h3>Delete Record?</h3>
+      <p>This supplier record will be <strong>permanently deleted</strong>. This action cannot be undone.</p>
+      <div class="modal-btns">
+        <button class="btn-premium danger" id="confirmDelete">
+          <span class="btn-inner"><i class="fas fa-trash"></i> Delete</span>
+          <div class="btn-bg"></div>
+        </button>
+        <button class="btn-ghost" id="cancelDelete">
+          <i class="fas fa-times"></i> Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <i class="fas fa-pills"></i>
+        <span>AI Pharma Supplier Details</span>
+      </div>
+      <div class="footer-credit">
+        <small>created by <strong>"SifatRupom"</strong></small>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
