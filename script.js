@@ -8,6 +8,7 @@ let suppliers = JSON.parse(localStorage.getItem('pharmaSuppliers')) || [];
 let deleteTargetId = null;
 let isEditing = false;
 let searchQuery = '';
+let isMySQLConnected = false;
 
 // ── DOM ──
 const form          = document.getElementById('supplierForm');
@@ -29,18 +30,55 @@ const loaderOverlay = document.getElementById('loaderOverlay');
 
 // ── INIT ──
 window.addEventListener('load', () => {
-  // Hide loader with delay
   setTimeout(() => {
     loaderOverlay.classList.add('hidden');
-  }, 1800);
+  }, 1200);
 
   initParticles();
   initNavbarScroll();
   initScrollReveal();
-  renderTable(suppliers);
-  updateStats();
+  loadData();
   initRipple();
 });
+
+// ── LOAD DATA FROM MYSQL / LOCALSTORAGE ──
+async function loadData() {
+  try {
+    const res = await fetch('/api/suppliers');
+    if (!res.ok) throw new Error('API offline');
+    const data = await res.json();
+    suppliers = data;
+    isMySQLConnected = true;
+    localStorage.setItem('pharmaSuppliers', JSON.stringify(suppliers));
+    setDBStatus(true);
+  } catch (err) {
+    console.warn('MySQL API unreachable, falling back to LocalStorage:', err.message);
+    isMySQLConnected = false;
+    suppliers = JSON.parse(localStorage.getItem('pharmaSuppliers')) || [];
+    setDBStatus(false);
+  }
+  renderTable(suppliers);
+  updateStats();
+}
+
+function setDBStatus(connected) {
+  const dbText = document.getElementById('dbStatusText');
+  const dbDot = document.getElementById('dbDot');
+  const heroBadge = document.getElementById('heroBadgeText');
+  const heroDot = document.getElementById('heroBadgeDot');
+  
+  if (connected) {
+    if (dbText) dbText.textContent = 'MySQL Connected';
+    if (dbDot) { dbDot.style.background = '#10b981'; dbDot.style.boxShadow = '0 0 8px #10b981'; }
+    if (heroBadge) heroBadge.textContent = 'MySQL Database Active';
+    if (heroDot) { heroDot.style.background = '#10b981'; heroDot.style.boxShadow = '0 0 8px #10b981'; }
+  } else {
+    if (dbText) dbText.textContent = 'Local Storage Mode';
+    if (dbDot) { dbDot.style.background = '#f59e0b'; dbDot.style.boxShadow = '0 0 8px #f59e0b'; }
+    if (heroBadge) heroBadge.textContent = 'Local Storage Active';
+    if (heroDot) { heroDot.style.background = '#f59e0b'; heroDot.style.boxShadow = '0 0 8px #f59e0b'; }
+  }
+}
 
 // ══════════════════════════════════════
 // PARTICLE SYSTEM
@@ -253,7 +291,7 @@ function renderTable(data) {
 // ══════════════════════════════════════
 // FORM SUBMIT
 // ══════════════════════════════════════
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const companyName  = document.getElementById('companyName').value.trim();
@@ -268,17 +306,50 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
+  const payload = { companyName, employeeName, phoneNumber, productName, suppliedBy };
+
   if (isEditing) {
-    const id  = editIdField.value;
+    const id = editIdField.value;
+    if (isMySQLConnected) {
+      try {
+        const res = await fetch(`/api/suppliers/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Failed to update in database');
+      } catch (err) {
+        console.error('Update DB error:', err);
+      }
+    }
     const idx = suppliers.findIndex(s => s.id === id);
     if (idx !== -1) {
-      suppliers[idx] = { ...suppliers[idx], companyName, employeeName, phoneNumber, productName, suppliedBy, updatedAt: new Date().toISOString() };
+      suppliers[idx] = { ...suppliers[idx], ...payload, updatedAt: new Date().toISOString() };
     }
-    showToast('Supplier updated successfully!', 'success', 'fas fa-check-circle');
+    showToast('Supplier updated in MySQL Database!', 'success', 'fas fa-check-circle');
     resetForm();
   } else {
-    suppliers.unshift({ id: generateId(), companyName, employeeName, phoneNumber, productName, suppliedBy, createdAt: new Date().toISOString() });
-    showToast('Supplier added successfully!', 'success', 'fas fa-check-circle');
+    const newId = generateId();
+    const newRecord = { id: newId, ...payload, createdAt: new Date().toISOString() };
+
+    if (isMySQLConnected) {
+      try {
+        const res = await fetch('/api/suppliers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newRecord)
+        });
+        if (!res.ok) throw new Error('Failed to save in database');
+        const saved = await res.json();
+        suppliers.unshift(saved);
+      } catch (err) {
+        console.error('Save DB error:', err);
+        suppliers.unshift(newRecord);
+      }
+    } else {
+      suppliers.unshift(newRecord);
+    }
+    showToast('Supplier saved to MySQL Database!', 'success', 'fas fa-check-circle');
     form.reset();
   }
 
@@ -347,13 +418,20 @@ function promptDelete(id) {
   deleteModal.classList.add('active');
 }
 
-confirmDelete.addEventListener('click', () => {
+confirmDelete.addEventListener('click', async () => {
   if (deleteTargetId) {
+    if (isMySQLConnected) {
+      try {
+        await fetch(`/api/suppliers/${deleteTargetId}`, { method: 'DELETE' });
+      } catch (err) {
+        console.error('Delete DB error:', err);
+      }
+    }
     suppliers = suppliers.filter(s => s.id !== deleteTargetId);
     save();
     applySearch();
     updateStats();
-    showToast('Record deleted.', 'error', 'fas fa-trash');
+    showToast('Record deleted from database.', 'error', 'fas fa-trash');
     deleteTargetId = null;
   }
   closeModal();

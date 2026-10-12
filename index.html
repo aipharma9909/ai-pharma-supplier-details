@@ -44,6 +44,10 @@
         </div>
       </div>
       <div class="nav-actions">
+        <div class="nav-stat" id="dbStatusPill" style="display: flex; align-items: center; gap: 8px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.25); padding: 6px 14px; border-radius: 50px;">
+          <span class="badge-dot" id="dbDot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+          <span id="dbStatusText" style="font-size: 0.78rem; font-weight: 600; color: #10b981;">MySQL Database</span>
+        </div>
         <div class="nav-stat">
           <span class="ns-count" id="navTotal">0</span>
           <span class="ns-label">Records</span>
@@ -56,8 +60,8 @@
   <section class="hero" id="heroSection">
     <div class="hero-inner">
       <div class="hero-badge">
-        <span class="badge-dot"></span>
-        <span>Live System Active</span>
+        <span class="badge-dot" id="heroBadgeDot"></span>
+        <span id="heroBadgeText">MySQL Database Active</span>
       </div>
       <h1 class="hero-title">
         <span class="title-line">AI Pharma</span>
